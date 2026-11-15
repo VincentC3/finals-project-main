@@ -34,9 +34,9 @@ function profileCompleteness(p) {
 }
 function typeLabel(t) {
   if (t === 'seller') return 'Seller';
-  if (t === 'buyer & seller') return 'Buyer & Seller';
   return 'Buyer';
 }
+
 
 function drawProfile(p, mine) {
   var percent = profileCompleteness(p);
@@ -57,10 +57,11 @@ function drawProfile(p, mine) {
   tiles.forEach(function (t) { tileHtml += '<div class="tile">' + ic(t[2]) + '<strong>' + esc(t[1]) + '</strong><span>' + esc(t[0]) + '</span></div>'; });
 
   var typeOptions = '';
-  [['buyer', 'Buyer'], ['seller', 'Seller'], ['buyer & seller', 'Buyer & Seller']].forEach(function (o) {
-    typeOptions += '<option value="' + o[0] + '"' + (p.accountType === o[0] ? ' selected' : '') + '>' + o[1] + '</option>';
-  });
-
+[['buyer', 'Buyer'], ['seller', 'Seller']].forEach(function (o) {
+  typeOptions += '<option value="' + o[0] + '"' +
+    (p.accountType === o[0] ? ' selected' : '') +
+    '>' + o[1] + '</option>';
+});
   $('#view').innerHTML =
     '<div class="page-head"><div class="grow"><h1>My Profile</h1><p>Your account details and activity.</p></div></div>' +
     '<section class="panel profile-head">' +

@@ -20,7 +20,7 @@ function renderShell() {
         '<a class="brand" href="#/market">' + logo + esc(C.STORE_NAME) + '</a>' +
         '<div><h2 class="label">Menu</h2><nav class="nav">' +
           '<a href="#/market" data-nav="market"><span class="ic">' + ic('store') + '</span><span>Market<small>Everything for sale</small></span></a>' +
-          '<a href="#/sell" data-nav="sell"><span class="ic">' + ic('plus') + '</span><span>Sell Item<small>Post something</small></span></a>' +
+          '<a href="#/sell" id="sellMenu" data-nav="sell"><span class="ic">' + ic('plus') + '</span><span>Sell Item<small>Post something</small></span></a>' +
           '<a href="#/my-listings" data-nav="my-listings"><span class="ic">' + ic('edit') + '</span><span>My Listings<small>Edit &amp; delete</small></span></a>' +
           '<a href="#/purchases" data-nav="purchases"><span class="ic">' + ic('bag') + '</span><span>My Purchases<small>Bought items &amp; rating</small></span></a>' +
           '<a href="#/ratings" data-nav="ratings"><span class="ic">' + ic('star') + '</span><span>Ratings<small>Top selling items</small></span></a>' +
@@ -45,7 +45,7 @@ function ensureShell() { if (!$('#view')) renderShell(); }
 
 /* ----------------------------------------------------------------- [CHROME] */
 function updateChrome() {
-  $$('[data-nav]').forEach(function (a) { a.classList.toggle('on', a.getAttribute('data-nav') === state.page); });
+  $$('[data-nav]').forEach(function (a) { a.classList.toggle('on', a.getAttribute('data-nav') === state.page); });updateSellMenu();
   var foot = $('#sideFoot'), top = $('#topAuth');
   if (!foot) return;
   var u = state.user;
@@ -145,3 +145,18 @@ D.init().then(function (u) {
   console.error(e);
   $('#app').innerHTML = '<p style="padding:2rem">Something went wrong while starting the store. Please refresh.</p>';
 });
+function updateSellMenu() {
+  var sellMenu = document.getElementById('sellMenu');
+  var sellTab = document.querySelector('.tabbar a[data-nav="sell"]');
+
+  var isBuyer = state.user &&
+    state.user.accountType === 'buyer';
+
+  if (sellMenu) {
+    sellMenu.style.display = isBuyer ? 'none' : '';
+  }
+
+  if (sellTab) {
+    sellTab.style.display = isBuyer ? 'none' : '';
+  }
+}
