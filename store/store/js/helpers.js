@@ -95,6 +95,10 @@ function fmtDist(d) {
 }
 function distOf(item) { return kmBetween(state.location.lat, state.location.lng, item.lat, item.lng); }
 function statOf(id) { return state.stats[id] || { buys: 0, avg: 0, count: 0 }; }
+function avatarInner(name, url) {
+  var u = safeUrl(url);
+  return u ? '<img src="' + esc(u) + '" alt="">' : esc((name || '?').trim().charAt(0).toUpperCase());
+}
 
 /* [CATEGORY-HELPERS] */
 var CATS = (C.CATEGORIES && C.CATEGORIES.length) ? C.CATEGORIES : [{ id: 'other', label: 'Other', emoji: '📦' }];

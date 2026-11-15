@@ -65,7 +65,8 @@
         email: m.email || u.email || '',
         company: m.company || '',
         accountType: m.account_type || 'buyer',
-        createdAt: u.created_at
+        createdAt: u.created_at,
+        avatarUrl: m.photo_url || m.avatar_url || m.picture || ''
       };
     }
     function need(res) { if (res.error) throw res.error; return res.data; }
@@ -109,14 +110,15 @@
       signOut: function () { return sb.auth.signOut(); },
 
       /* --------------------------------------------------------- [LIVE-PROFILE] */
-      getProfile: function () {
+           getProfile: function () {
         var u = needUser();
         return sb.from('profiles').select('*').eq('id', u.id).maybeSingle().then(need).then(function (p) {
           p = p || {};
           return {
             id: u.id, name: p.username || u.name, mobile: p.mobile || u.mobile, email: p.email || u.email,
             company: p.company || u.company, accountType: p.account_type || u.accountType,
-            bio: p.bio || '', city: p.city || '', createdAt: p.created_at || u.createdAt
+            bio: p.bio || '', city: p.city || '', createdAt: p.created_at || u.createdAt,
+            avatarUrl: u.avatarUrl || ''
           };
         });
       },
@@ -131,7 +133,22 @@
           return sb.auth.updateUser({ data: { username: f.name, company: f.company, account_type: f.accountType } });
         }).then(function () { return true; });
       },
-
+      uploadAvatar: function (file) {
+        var u = needUser();
+        if (!file || !/^image\//.test(file.type)) throw new Error('Choose an image file.');
+        if (file.size > 3 * 1024 * 1024) throw new Error('Image is too big. Max 3 MB.');
+        var ext = (file.type.split('/')[1] || 'jpg').replace('jpeg', 'jpg');
+        var path = u.id + '/avatar-' + Date.now() + '.' + ext;
+        return sb.storage.from(C.STORAGE_BUCKET).upload(path, file, { contentType: file.type, cacheControl: '31536000' }).then(function (r) {
+          if (r.error) throw r.error;
+          var url = sb.storage.from(C.STORAGE_BUCKET).getPublicUrl(path).data.publicUrl;
+          return sb.auth.updateUser({ data: { photo_url: url } }).then(function (res) {
+            if (res.error) throw res.error;
+            user.avatarUrl = url;
+            return url;
+          });
+        });
+      },
       /* ----------------------------------------------------------- [LIVE-ITEMS] */
       listItems: function () {
         return sb.from('items').select('*').eq('status', 'available').order('created_at', { ascending: false }).limit(500).then(need);
@@ -358,7 +375,8 @@
         emit();
         return wait(true);
       },
-      signInGoogle: function () { return fail('Google login needs Supabase. Add your keys in config.js first.'); },
+            signInGoogle: function () { return fail('Google login needs Supabase. Add your keys in config.js first.'); },
+      uploadAvatar: function () { return fail('Photo upload needs Supabase.'); },
       signOut: function () {
         user = null; try { localStorage.removeItem(SKEY); } catch (e) {}
         emit(); return wait(true);

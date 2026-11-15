@@ -51,7 +51,7 @@ function updateChrome() {
   var u = state.user;
   var demo = D.mode === 'demo' ? '<div class="demo-note"><b>Demo mode</b>Sample data lives only in this browser. Add your Supabase keys in <code>config.js</code> to go live.</div>' : '';
   if (u) {
-    foot.innerHTML = demo + '<div class="me"><a class="avatar" href="#/profile">' + esc((u.name || '?').trim().charAt(0).toUpperCase()) + '</a>' +
+    foot.innerHTML = demo + '<div class="me"><a class="avatar" href="#/profile">' + avatarInner(u.name, u.avatarUrl) + '</a>' +
       '<div class="me-meta"><strong>' + esc(u.name) + '</strong><small>' + esc(u.accountType || 'member') + '</small></div>' +
       '<button class="out" id="logoutBtn" title="Log out" aria-label="Log out">' + ic('logout') + '</button></div>';
     top.innerHTML = '<button class="btn btn-ghost btn-sm" id="logoutBtn2">' + ic('logout') + ' Log out</button>';

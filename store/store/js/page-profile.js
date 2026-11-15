@@ -65,7 +65,7 @@ function drawProfile(p, mine) {
   $('#view').innerHTML =
     '<div class="page-head"><div class="grow"><h1>My Profile</h1><p>Your account details and activity.</p></div></div>' +
     '<section class="panel profile-head">' +
-      '<div class="avatar big">' + esc((p.name || '?').charAt(0).toUpperCase()) + '</div>' +
+     '<div class="avatar big">' + avatarInner(p.name, p.avatarUrl) + '</div>' +
       '<div class="profile-who"><h2>' + esc(p.name) + '</h2>' +
         '<div class="chips"><span class="chip warm">' + esc(typeLabel(p.accountType)) + '</span>' +
           (p.company ? '<span class="chip">' + ic('building') + ' ' + esc(p.company) + '</span>' : '') +
@@ -88,10 +88,19 @@ function drawProfile(p, mine) {
         '<div class="two"><div class="field"><label>Company / Shop name</label><input class="input" id="pCompany" maxlength="60" value="' + esc(p.company) + '"></div>' +
           '<div class="field"><label>City / Area</label><input class="input" id="pCity" maxlength="60" value="' + esc(p.city) + '"></div></div>' +
         '<div class="field"><label>About me</label><textarea class="textarea" id="pBio" maxlength="300" placeholder="Tell buyers a little about you or your shop">' + esc(p.bio) + '</textarea></div>' +
+                '<div class="field"><label>Profile photo</label><button class="btn btn-soft btn-sm" type="button" id="pPhotoBtn">Choose photo</button><input type="file" id="pPhoto" accept="image/*" hidden></div>' +
         '<div class="edit-btns"><button class="btn btn-primary" id="pSave" type="submit">Save profile</button></div>' +
       '</form></section>';
 
   $('#profileForm').addEventListener('submit', function (e) { e.preventDefault(); saveProfile(); });
+    $('#pPhotoBtn').addEventListener('click', function () { $('#pPhoto').click(); });
+  $('#pPhoto').addEventListener('change', function (e) {
+    var file = e.target.files[0]; if (!file) return;
+    var btn = $('#pPhotoBtn'); btn.disabled = true; btn.textContent = 'Uploading…';
+    Promise.resolve().then(function () { return D.uploadAvatar(file); }).then(function () {
+      state.user = D.user(); toast('Photo updated.', 'ok'); updateChrome(); showProfile();
+    }).catch(function (err) { toast(D.niceError(err), 'bad'); btn.disabled = false; btn.textContent = 'Choose photo'; });
+  });
   window.scrollTo(0, 0);
 }
 
